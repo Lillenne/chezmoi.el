@@ -265,10 +265,18 @@ Note: Does not run =chezmoi edit=."
 	(when-let ((mode (thread-first target-file
 				       file-name-nondirectory
 				       (assoc-default auto-mode-alist 'string-match))))
-	  (funcall mode))
-	(message target-file)
-	(unless chezmoi-mode (chezmoi-mode))
-	source-file))))
+          (funcall
+           (if (and (listp mode) (null (car mode)))
+               (save-window-excursion
+                 (let* ((existed (get-file-buffer target-file))
+                        (_ (find-file target-file))
+                        (m major-mode))
+                   (unless existed (kill-current-buffer))
+                   m))
+	     mode)))
+        (message target-file)
+        (unless chezmoi-mode (chezmoi-mode))
+        source-file))))
 
 (defun chezmoi-sync-files (files &optional arg)
   "Iteratively select file from FILES to sync.
