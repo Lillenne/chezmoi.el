@@ -83,7 +83,7 @@ If ARG is non-nil, switch to the diff-buffer."
   (let ((b (get-buffer-create "*chezmoi-diff*")))
     (with-current-buffer b
       (erase-buffer)
-      (chezmoi--locally (shell-command (concat chezmoi-command " diff") b)))
+      (chezmoi--locally (shell-command (concat chezmoi-command " diff --use-builtin-diff") b)))
     (unless arg
       (switch-to-buffer b)
       (diff-mode)
