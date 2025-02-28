@@ -91,15 +91,13 @@ If ARG is non-nil, switch to the diff-buffer."
     b))
 
 (defun chezmoi-changed-files ()
-  "Use chezmoi diff to return the files that have changed."
-  (with-current-buffer (chezmoi-diff t)
-    (goto-char (point-max))
-    (let (files line-beg)
-      (while (setq line-beg (re-search-backward "^\\+\\{3\\} .*" nil t))
-	(let ((file-name (thread-first line-beg
-				       (buffer-substring-no-properties (line-end-position))
-				       (substring 5))))
-	  (push (concat "~" file-name) files)))
+  "Use chezmoi status to return the files that have changed."
+  (let ((files '()))
+    (with-temp-buffer
+      (call-process-shell-command "chezmoi status" nil (current-buffer))
+      (re-search-backward "[[:space:]]*[^[:space:]] \\(.*\\)" nil t)
+      (let ((match (match-string 1)))
+        (when match (push match files)))
       files)))
 
 (defun chezmoi-changed-p (file)
