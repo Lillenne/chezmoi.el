@@ -248,6 +248,12 @@ PROMPT, CHOICES, and CATEGORY are passed to `complete-with-action'."
 		       (complete-with-action action choices string predicate)))
 		   nil t))
 
+(defun chezmoi--use-template (file)
+  "If the input `FILE' matches the regex."
+  (let ((ret))
+        (dolist (i chezmoi-use-template-source-mode-regex ret)
+        (setq ret (or ret (string-match i file))))))
+
 (defun chezmoi-find (file)
   "Edit a source FILE managed by chezmoi.
 If the target file has the same state as the source file,add a hook to
@@ -262,7 +268,8 @@ Note: Does not run =chezmoi edit=."
     (when source-file
       (find-file source-file)
       (let ((target-file (expand-file-name file)))
-	(when-let ((mode (assoc-default target-file auto-mode-alist 'string-match))))
+	(when-let ((mode (and (chezmoi--use-template target-file)
+                              (assoc-default target-file auto-mode-alist 'string-match))))
           (funcall
            (if (and (listp mode) (null (car mode)))
                (save-window-excursion

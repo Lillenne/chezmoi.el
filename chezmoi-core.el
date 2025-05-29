@@ -45,6 +45,11 @@
   :type '(string)
   :group 'chezmoi)
 
+(defcustom chezmoi-use-template-source-mode-regex '(".*")
+  "If any match, activates the target file major mode in template files."
+  :group 'chezmoi
+  :type '(repeat string))
+
 (defvar chezmoi-command-error-regex "chezmoi:"
   "Regex for detecting if chezmoi has encountered an error.")
 
