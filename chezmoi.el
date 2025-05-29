@@ -94,12 +94,11 @@ If ARG is non-nil, switch to the diff-buffer."
   "Use chezmoi status to return the files that have changed."
   (let ((files '()))
     (with-temp-buffer
-      ;; note, can use "-p absolute" to get the full path directly
-      (call-process-shell-command "chezmoi status" nil (current-buffer))
-      (while(re-search-backward "^[[:space:]|ADMR][ADMR] \\(.*\\)" nil t)
-        (let ((match (match-string 1)))
-                (when match (push (concat "~/" match) files))))
-      files))
+
+    (call-process-shell-command "chezmoi status" nil (current-buffer))
+    (while (re-search-backward "^[[:space:]|ADMR][ADMR] \\(.*\\)" nil t)
+              (push (concat "~/" (match-string 1)) files))
+      files)))
 
 (defun chezmoi-changed-p (file)
   "Return non-nil of FILE has changed."
