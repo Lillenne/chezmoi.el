@@ -261,10 +261,8 @@ Note: Does not run =chezmoi edit=."
   (let ((source-file (chezmoi-source-file file)))
     (when source-file
       (find-file source-file)
-      (let ((target-file (chezmoi-target-file source-file)))
-	(when-let ((mode (thread-first target-file
-				       file-name-nondirectory
-				       (assoc-default auto-mode-alist 'string-match))))
+      (let ((target-file (expand-file-name file)))
+	(when-let ((mode (assoc-default target-file auto-mode-alist 'string-match))))
           (funcall
            (if (and (listp mode) (null (car mode)))
                (save-window-excursion
