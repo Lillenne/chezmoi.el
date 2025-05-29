@@ -343,9 +343,10 @@ Prefix ARG is passed to `chezmoi-write'."
 (define-minor-mode chezmoi-mode
   "Chezmoi mode for source files."
   :group 'chezmoi
+  (defvar chezmoi-mode-overwrite-destination) ; silence
   (if chezmoi-mode
       (progn
-	(unless (chezmoi-changed-p (buffer-file-name))
+	(when (or chezmoi-mode-overwrite-destination (chezmoi-changed-p (buffer-file-name)))
 	  (add-hook 'after-save-hook #'chezmoi-write 0 t))
 	(add-hook 'after-change-functions #'chezmoi-template--after-change nil 1)
 
