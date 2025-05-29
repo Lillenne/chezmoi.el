@@ -90,6 +90,32 @@ If ARG is non-nil, switch to the diff-buffer."
       (whitespace-mode 0))
     b))
 
+(defvar chezmoi--merge-procs nil "List of chezmoi merge processes.")
+
+(defun chezmoi-merge (file)
+  "Runs chezmoi merge on `FILE'.
+Requires chezmoi to be configured with an external mergetool (emacs, perhaps?)."
+  (interactive
+   (list (chezmoi--completing-read "Select a dotfile to merge: "
+                   (chezmoi-changed-files)
+                   'project-file)))
+  (when (file-exists-p file)
+    (push (start-process-shell-command "chezmoi" nil (concat "chezmoi merge " file))
+          chezmoi--merge-procs)))
+
+(defun chezmoi-merge-all ()
+  "Call 'chezmoi merge-all'."
+  (interactive)
+  (push (start-process-shell-command "chezmoi" nil "chezmoi merge-all")
+        chezmoi--merge-procs))
+
+(defun chezmoi-merge-quit ()
+  "Help, I ran chezmoi merge without reading the documentation!"
+  (interactive)
+  (dolist (i chezmoi--merge-procs)
+    (kill-process i))
+  (setq chezmoi--merge-procs nil))
+
 (defun chezmoi-changed-files ()
   "Use chezmoi status to return the files that have changed."
   (let ((files '()))
