@@ -56,6 +56,12 @@ If the target has been changed, it will be overwritten."
   :group 'chezmoi
   :type '(boolean))
 
+(defcustom chezmoi-root (file-name-as-directory
+             (substring (shell-command-to-string "chezmoi source-path") 0 -1))
+"The source directory for chezmoi."
+  :group 'chezmoi
+  :type '(string))
+
 (defvar chezmoi-command-error-regex "chezmoi:"
   "Regex for detecting if chezmoi has encountered an error.")
 
@@ -83,6 +89,13 @@ If the target has been changed, it will be overwritten."
   '(".literal"
     ".tmpl")
   "Source state attribute suffixes.")
+
+(defun chezmoi--mode-from-path ()
+  "Activate `chezmoi-mode' in source files based on their path"
+  (when (string-match chezmoi-root (buffer-file-name))
+    (unless chezmoi-mode (chezmoi-mode))))
+
+(add-hook 'find-file-hook #'chezmoi--mode-from-path)
 
 (provide 'chezmoi-core)
 
