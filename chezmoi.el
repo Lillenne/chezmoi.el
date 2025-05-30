@@ -76,6 +76,23 @@
 	       (cl-mapcar #'expand-file-name)
 	       (member (expand-file-name file))))
 
+(defun chezmoi-source-file-p (file)
+  "Returns non-nil if `FILE' is in the source state."
+  (string-match chezmoi-root file))
+
+(defun chezmoi-encrypted-p (file)
+  "Returns non-nil if `FILE' is encrypted in the source state."
+  (or (string-match "encrypted_" file)
+      (string-match "encrypted_" (or (chezmoi-source-file file) ""))))
+
+(defun chezmoi-template-file-p (file)
+  "Returns non-nil if `FILE' is a chezmoi template file.
+
+Does not check if the file is managed by chezmoi."
+  (string-match ".*\\.tmpl" (if (chezmoi-source-file-p file)
+                                file
+                              (chezmoi-source-file file))))
+
 (defun chezmoi-diff (arg)
   "View output of =chezmoi diff= in a diff-buffer.
 If ARG is non-nil, switch to the diff-buffer."
@@ -332,9 +349,7 @@ Prefix ARG is passed to `chezmoi-write'."
   (interactive (list (buffer-file-name)))
   (if (chezmoi-target-file-p file)
       (chezmoi-find file)
-    (thread-first file
-		  chezmoi-target-file
-		  find-file)))
+    (find-file (chezmoi-target-file file))))
 
 (defun chezmoi-font-lock-keywords ()
   "Keywords for font lock."
